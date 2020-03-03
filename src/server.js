@@ -1,5 +1,5 @@
 import express from "express";
-import fileStream from "fs";
+import appHandler from "./server-entry";
 
 //Instantiate the server
 const server = express();
@@ -16,8 +16,18 @@ server.get("/favicon.ico", (request,response) => {
 
 //Listen for all (*) requests
 server.get("*", (request, response) => {
-    const htmlText = fileStream.readFileSync('./dist/index.html', 'utf-8');
-    response.end(htmlText);
+    appHandler(request, (err,html) => {
+        //If there's an error handle it
+        if (err) 
+            if (err.code === 404)
+                response.status(404).end('Page not found')
+            else
+                response.status(500).end('Internal Server Error')
+        else
+            //Otherwise pass the rendered html
+            //to the output
+            response.end(html)
+    });
 });
 
 //Set the port and start the server
