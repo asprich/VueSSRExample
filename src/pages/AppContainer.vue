@@ -1,11 +1,13 @@
 <template>
     <div>
         <div>
-            <a href="/">Home</a>
-            <a href="/about">About</a>
+            <router-link to="/">Home</router-link>
+            <router-link to="/about">About</router-link>
         </div>
 
-        <div>{{futurePageContents}}</div>
+        <div>
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 
@@ -13,7 +15,6 @@
 export default {
     name: "AppContainer",
     data: () => ({
-        futurePageContents: "Page contents goes here"
     })
 }
 </script>
