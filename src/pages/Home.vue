@@ -8,7 +8,13 @@
 export default {
     name: "Home",
     data: () => ({
-        message: "This is the home content!"
-    })
+        message: null
+    }),
+    mounted() {
+        setTimeout(() => this.message = "This is the home content!", 1500);
+    },
+    serverPrefetch() {
+        this.message = "This is the home content!";
+    }
 }
 </script>

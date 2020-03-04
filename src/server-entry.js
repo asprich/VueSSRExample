@@ -6,7 +6,7 @@ const vueServerRenderer = require("vue-server-renderer");
 //Grab the contents of our index file
 const htmlTemplate = fileStream
     .readFileSync('./dist/index.html', 'utf-8')
-    .replace('<div id="app"></div>','<div id="app"><!--vue-ssr-outlet--></div>');
+    .replace('<div id="app"></div>','<!--vue-ssr-outlet-->');
 
 //Create an instance of our renderer
 var renderer = vueServerRenderer.createRenderer({
