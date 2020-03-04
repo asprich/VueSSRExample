@@ -17,7 +17,7 @@ var renderer = vueServerRenderer.createRenderer({
 function createVueInstanceAndSetRouterUrl(context) {
     return new Promise((resolve, reject) => {
         //Instantiate the vue instance
-        const { vueInstance, router } = appStart();
+        const { vueInstance, router, store } = appStart();
 
         //Make the vue router aware of the url
         router.push(context.url).catch(err => {
@@ -26,8 +26,14 @@ function createVueInstanceAndSetRouterUrl(context) {
         }); 
             
         //Once a route has been found and the router is ready
-        router.onReady(() => 
-            resolve({ context, vueInstance, router }), 
+        router.onReady(() => {
+                //Set the state so it can be passed to the client
+                context.rendered = () => {
+                    context.state = store.state;
+                }
+
+                resolve({ context, vueInstance, router });
+            }, 
             reject);
     });
 }
@@ -42,7 +48,7 @@ function verifyComponentExistsForRoute({ context, vueInstance, router }) {
             return reject({ code: 404 });
 
         //Otherwise continue to the next step
-        resolve({ context, vueInstance});
+        resolve({ context, vueInstance });
     });
 }
 
