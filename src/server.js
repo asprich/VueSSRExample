@@ -16,18 +16,14 @@ server.get("/favicon.ico", (request,response) => {
 
 //Listen for all (*) requests
 server.get("*", (request, response) => {
-    appHandler(request, (err,html) => {
-        //If there's an error handle it
-        if (err) 
+    appHandler(request)
+        .then(html => response.end(html))
+        .catch(err => {
             if (err.code === 404)
                 response.status(404).end('Page not found')
             else
                 response.status(500).end('Internal Server Error')
-        else
-            //Otherwise pass the rendered html
-            //to the output
-            response.end(html)
-    });
+        });
 });
 
 //Set the port and start the server

@@ -7,7 +7,7 @@ import About from "../pages/About";
 //Register the plugin with Vue
 Vue.use(VueRouter);
 
-export default new VueRouter({
+export default () => new VueRouter({
     mode: "history",
     routes: [
         { path: "/", component: Home },

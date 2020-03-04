@@ -13,13 +13,58 @@ var renderer = vueServerRenderer.createRenderer({
     template: htmlTemplate
 });
 
+
+function createVueInstanceAndSetRouterUrl(context) {
+    return new Promise((resolve, reject) => {
+        //Instantiate the vue instance
+        const { vueInstance, router } = appStart();
+
+        //Make the vue router aware of the url
+        router.push(context.url).catch(err => {
+            if (!/NavigationDuplicated/.test(err.name)) 
+                console.log(err);
+        }); 
+            
+        //Once a route has been found and the router is ready
+        router.onReady(() => 
+            resolve({ context, vueInstance, router }), 
+            reject);
+    });
+}
+
+function verifyComponentExistsForRoute({ context, vueInstance, router }) {
+    return new Promise((resolve, reject) => {
+        //Look for matching components
+        const matchedComponents = router.getMatchedComponents();
+
+        //If none are found 404
+        if (!matchedComponents.length)
+            return reject({ code: 404 });
+
+        //Otherwise continue to the next step
+        resolve({ context, vueInstance});
+    });
+}
+
+function renderVueComponentToString({ context, vueInstance }) {
+    return new Promise((resolve, reject) => {
+        renderer.renderToString(vueInstance, context, (err, html) => {
+            if (err)
+                reject(err);
+            else 
+                resolve(html);
+        });
+    });
+}
+
+
 //Export a request handler
-export default (request, responseCallback) => {
+export default request => {
     //Set up a context for the renderer
     const context = { url: request.url };
 
-    //Instantiate the vue instance
-    const { vueInstance } = appStart();
-    
-    renderer.renderToString(vueInstance, context, responseCallback);
+    //Handle request
+    return createVueInstanceAndSetRouterUrl(context)
+        .then(verifyComponentExistsForRoute)
+        .then(renderVueComponentToString);
 }
